@@ -2,7 +2,7 @@ const cheerio = require('cheerio');
 const request = require('request');
 const { Canvas } = require('canvas-constructor');
 const { registerFont, createCanvas } = require('canvas');
-const fsn = require('fs-nextra');
+const fs = require('fs');
 
 async function get(req, res) {
     res.setHeader('Content-Type', 'image/png');
@@ -17,7 +17,7 @@ async function get(req, res) {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'
         },
         json: true
-    }, (err, res, body) => {
+    }, async (err, res, body) => {
         if (err) return console.error(err);
 
         // Playtime >>>>>>>>>>>>>>>>>>>>>>>>>
@@ -27,6 +27,7 @@ async function get(req, res) {
 
         // Rank >>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         let special = false;
+        if(steamID64 === "76561198055522004") special = true;
         let rankWeight = {
             'Special': 0,
             'Root': 1,
@@ -72,26 +73,27 @@ async function get(req, res) {
         // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
         // Font Sizing & Placement >>>>>>>>>>
-        registerFont('../../assets/font/signature.ttf', {family: 'signature'});
-        let nameSize = "13";
-        let nameEntryX = 177;
-        let nameEntryY = 30;
-        if(name.length > 22 && name.length < 26) nameSize = "11";
-        if(name.length > 26 && name.length < 31) nameSize = "9";
-        if(name.length > 31 && name.length < 40) nameSize = "7";
-        if(name.length > 40) nameSize = "5";
+        registerFont('./assets/font/signature.ttf', {family: 'signature'});
+        let nameSize = "36";
+        let nameEntryX = 122;
+        let nameEntryY = 49;
+        if(name.length > 22 && name.length < 26) nameSize = "31";
+        if(name.length > 26 && name.length < 31) nameSize = "24";
+        if(name.length > 31 && name.length < 40) nameSize = "20";
+        if(name.length > 40) nameSize = "16";
         // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
         // Image Processing >>>>>>>>>>>>>>>>>
-        let cardImage = await fsn.readFile(`../../assets/img/${rank}-Card.png`);
-        let finalCard = new Canvas(741, 176)
-              .addImage(cardImage, 0, 0, 741, 176)
-              .setTextFont(`${nameSize}px signature`)
-              .setColor("#ffffff")
-              .addText(name, nameEntryX, nameEntryY)
-              .toBuffer();
-        res.send(finalCard)
-        return res.end();
+        fs.readFile(`./assets/img/${rank}-Card.png`, (e, cardImage) => {
+            let finalCard = new Canvas(511, 121)
+                .addImage(cardImage, 0, 0, 511, 121)
+                .setTextFont(`${nameSize}px signature`)
+                .setColor("#ffffff")
+                .addText(name, nameEntryX, nameEntryY)
+                .toBuffer();
+            res.send(finalCard)
+            return res.end();
+        });
         // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
         // Steam Avatar >>>>>>>>>>>>>>>>>>>>> 

@@ -7,6 +7,7 @@ const routes = require(`${__dirname}/routes`);
 const utils = require(`${__dirname}/../util`);
 const https = require('https');
 const helmet = require('helmet');
+const fs = require('fs')
 
 /** Express Webserver Class */
 class SignatureGenerator {
@@ -25,7 +26,7 @@ class SignatureGenerator {
 
 
         // routing
-        this.app.get('/sigs', routes.sigs.bind(this));
+        this.app.get('/sigs', routes.sigs.get.bind(this));
 
         // Begin server
         this.startServer();
